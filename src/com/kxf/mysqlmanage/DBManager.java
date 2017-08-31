@@ -10,7 +10,7 @@ public interface DBManager {
 	long save(Object o);
 	long saveOrUpdate(Object o);
 
-	long update(Object o);
+	long update(Object o, DBWhereBuilder dbw);
 	
 	<T> List<T> find(Class<T> cls, DBWhereBuilder dbw, String... orders);
 	<T> List<T> find(Class<T> cls, DBWhereBuilder dbw, Boolean isAsc, String... orders);

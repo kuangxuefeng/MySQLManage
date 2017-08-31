@@ -20,7 +20,7 @@ public class Test {
 				System.err.println(e);
 			}
 		});
-		DBManager db = new SimpleDBManage();
+		SimpleDBManage db = new SimpleDBManage();
 		TestObject to = new TestObject();
 //		to.setId(100);
 //		to.setName("lili3");
@@ -28,17 +28,23 @@ public class Test {
 //		System.out.println(to.getClass().getSimpleName());
 //		db.save(to);
 		
-		List<TestObject> ls = db.findAll(TestObject.class);
-		System.out.println("ls=" + ls);
+		to.setId(119);
+		to.setName("haha119");
+		to.setShenggao(119.01);
+		DBWhereBuilder dbw1 = new DBWhereBuilder("id", "=", "119");
+		db.update(to, dbw1 );
+//		
+//		List<TestObject> ls = db.findAll(TestObject.class);
+//		System.out.println("ls=" + ls);
 		
 		DBWhereBuilder dbw = new DBWhereBuilder("id", ">", "103");
 		dbw.or("shenggao", "=", "175.55");
 		List<TestObject> ls1 = db.find(TestObject.class, dbw, false, "shenggao", "id");
 		System.out.println("ls1=" + ls1);
 		
-		String[] keys = ((SimpleDBManage) db).getPrimaryKey(TestObject.class);
-		for (int i = 0; i < keys.length; i++) {
-			System.out.println(keys[i]);
+		String[] Keys = db.getPrimaryKey(TestObject.class);
+		for (int i = 0; i < Keys.length; i++) {
+			System.out.println(Keys[i]);
 		}
 	}
 }

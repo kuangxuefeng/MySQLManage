@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.kxf.mysqlmanage.DBWhereBuilder.DBWhere;
+
 public class SimpleDBManage implements DBManager {
 	private final String default_Primary_Key = "id";
 	private final String orderSql = " ORDER BY ";// 排序语句
@@ -98,9 +100,38 @@ public class SimpleDBManage implements DBManager {
 	}
 
 	@Override
-	public long update(Object o) {
-		
-		return 0;
+	public long update(Object o, DBWhereBuilder dbw) {
+		String tName = o.getClass().getSimpleName();
+		String sql = "update " + tName + " set ";
+		Map<String, Object> setVal = getContentValues(o);
+		List<DBWhere> dbws = dbw.value();
+		Set<String> keys = setVal.keySet();
+		String set = "";
+		for (String s : keys) {
+			boolean isWhere = false;
+			for (DBWhere d : dbws) {
+				if (s.equals(d.column)) {
+					isWhere = true;
+					break;
+				}
+			}
+			if (!isWhere) {
+				set = set + s + "=" + setVal.get(s) + ",";
+			}
+		}
+		set = set.substring(0, set.length()-1);
+		sql = sql + set + dbw.getWhereSql();
+		LogUtils.i("sql=" + sql);
+		Connection conn = openConnection();
+		long raw = -1;
+		try {
+			Statement stat = conn.createStatement();
+			raw = stat.executeUpdate(sql);
+		} catch (SQLException e) {
+			LogUtils.e(e.toString());
+		}
+		closeConn(conn);
+		return raw;
 	}
 
 	@Override
@@ -135,7 +166,6 @@ public class SimpleDBManage implements DBManager {
 			fs[i].setAccessible(true);
 			try {
 				String type = fs[i].getType().getSimpleName();
-				LogUtils.i("type=" + type);
 				if ("String".equals(type)) {
 					values.put(fs[i].getName(), "\'" + fs[i].get(o) + "\'");
 				} else {
@@ -286,14 +316,12 @@ public class SimpleDBManage implements DBManager {
 			T t;
 			while (rs.next()) {
 				t = (T) Class.forName(cls.getName()).newInstance();
-				LogUtils.i("t=" + t.toString());
 				for (int i = 0; i < fs.length; i++) {
 					fs[i].setAccessible(true);
 					// 属性的名称 是getName()得到， 得到属性的值用fi[i].get(u)
 					// 这个里面可以得到对应的属性值，也就是getName 的Value
 					Class<?> type = fs[i].getType();
-					LogUtils.i("type=" + type.getName());
-					if ("java.lang.String".equals(type.getSimpleName())) {
+					if ("String".equals(type.getSimpleName())) {
 						fs[i].set(t,
 								rs.getString(rs.findColumn(fs[i].getName())));
 					} else if ("int".equals(type.getSimpleName())) {

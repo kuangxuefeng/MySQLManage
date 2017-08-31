@@ -5,6 +5,11 @@ import java.util.List;
 
 public class DBWhereBuilder {
 	private List<DBWhere> dbws;
+	
+	public List<DBWhere> value(){
+		return dbws;
+	}
+	
 	public DBWhereBuilder(String column, String symbol, String value) {
 		dbws = new ArrayList<DBWhereBuilder.DBWhere>();
 		DBWhere dbw = new DBWhere(column, symbol, value, "");
