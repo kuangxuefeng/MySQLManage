@@ -136,26 +136,7 @@ public class SimpleDBManage implements DBManager {
 
 	@Override
 	public <T> List<T> findAll(Class<T> cls) {
-		String tName = cls.getSimpleName();
-		// 查询SQL语句
-		String sql = "select * from " + tName;
-		// 获得连接
-		Connection conn = openConnection();
-		List<T> list = new ArrayList<T>();
-
-		// 执行查询
-		ResultSet rs = null;
-		try {
-			// 获得预定义语句
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		list = toObject(rs, cls);
-		closeConn(conn);
-		return list;
+		return find(cls, null);
 	}
 
 	private Map<String, Object> getContentValues(Object o) {
@@ -275,7 +256,7 @@ public class SimpleDBManage implements DBManager {
 	public <T> List<T> find(Class<T> cls, DBWhereBuilder dbw, Boolean isAsc,
 			String... orders) {
 		String tName = cls.getSimpleName();
-		String orderStr = "";
+		String orderStr = " ";
 		if (orders != null && orders.length > 0) {
 			orderStr = orderSql;
 			for (String s : orders) {
@@ -284,7 +265,11 @@ public class SimpleDBManage implements DBManager {
 			orderStr = orderStr.substring(0, orderStr.length() - 1);
 		}
 		// 查询SQL语句
-		String sql = "select * from " + tName + dbw.getWhereSql() + orderStr;
+		String sql = "select * from " + tName;
+		if (null != dbw) {
+			sql = sql + dbw.getWhereSql();
+		}
+		sql = sql + orderStr;
 		if (!isAsc) {
 			sql = sql + " desc";
 		}
