@@ -43,7 +43,7 @@ public class SimpleDBManage implements DBManager {
 			Class.forName(driver);
 			return DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		}
 
 		return null;
@@ -57,7 +57,7 @@ public class SimpleDBManage implements DBManager {
 				conn = null;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		}
 	}
 
@@ -153,7 +153,7 @@ public class SimpleDBManage implements DBManager {
 					values.put(fs[i].getName(), fs[i].get(o));
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtils.e(e.toString());
 			}
 		}
 		LogUtils.i("values=" + values);
@@ -172,7 +172,7 @@ public class SimpleDBManage implements DBManager {
 				ls.add(rs.getString(3));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} finally {
 			closeConn(conn);
 		}
@@ -210,7 +210,7 @@ public class SimpleDBManage implements DBManager {
 				closeConn(conn);
 				return true;
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LogUtils.e(e.toString());
 			}
 		}
 		return false;
@@ -285,8 +285,7 @@ public class SimpleDBManage implements DBManager {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		}
 		list = toObject(rs, cls);
 		closeConn(conn);
@@ -321,23 +320,17 @@ public class SimpleDBManage implements DBManager {
 				list.add(t);
 			}
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		}
 		return list;
 	}
@@ -378,7 +371,7 @@ public class SimpleDBManage implements DBManager {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtils.e(e.toString());
 		}
 		closeConn(con);
 		return null;
