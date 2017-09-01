@@ -119,7 +119,7 @@ public class SimpleDBManage implements DBManager {
 				set = set + s + "=" + setVal.get(s) + ",";
 			}
 		}
-		set = set.substring(0, set.length()-1);
+		set = set.substring(0, set.length() - 1);
 		sql = sql + set + dbw.getWhereSql();
 		LogUtils.i("sql=" + sql);
 		Connection conn = openConnection();
@@ -212,7 +212,14 @@ public class SimpleDBManage implements DBManager {
 			} catch (SQLException e) {
 				LogUtils.e(e.toString());
 			}
+		} else {
+			return checkTableColumn(o);
 		}
+		return false;
+	}
+
+	private boolean checkTableColumn(Object o) {
+
 		return false;
 	}
 
@@ -345,35 +352,35 @@ public class SimpleDBManage implements DBManager {
 	 * @return 执行成功返回一个主键名的字符数组，否则返回null或抛出一个异常
 	 * @exception 抛出sql执行异常
 	 */
-	public String[] getPrimaryKey(Class cls) {
-		Connection con = openConnection();; 
-		String tName = cls.getSimpleName();
-		String sql = "SHOW CREATE TABLE " + tName;
-
-		try {
-
-			PreparedStatement pre = con.prepareStatement(sql);
-			ResultSet rs = pre.executeQuery();
-			if (rs.next()) {
-
-				// 正则匹配数据
-				Pattern pattern = Pattern
-						.compile("PRIMARY KEY \\(\\`(.*)\\`\\)");
-				Matcher matcher = pattern.matcher(rs.getString(2));
-				matcher.find();
-				String data = matcher.group();
-				// 过滤对于字符
-				data = data.replaceAll("\\`|PRIMARY KEY \\(|\\)", "");
-				// 拆分字符
-				String[] stringArr = data.split(",");
-
-				return stringArr;
+	public List<String> getPrimaryKey(Class cls) {
+		List<TbColumnInfo> infos = getAllColumnDB(cls);
+		List<String> list = null;
+		if (infos != null && infos.size() > 0) {
+			list = new ArrayList<String>();
+			for (TbColumnInfo info : infos) {
+				if (null != info.getKey() && "PRI".equals(info.getKey())) {
+					list.add(info.getField());
+				}
 			}
+		}
+		return list;
+	}
 
+	public List<TbColumnInfo> getAllColumnDB(Class cls) {
+		Connection con = openConnection();
+		;
+		String tName = cls.getSimpleName();
+		String sql = "SHOW COLUMNS FROM " + tName;
+		ResultSet rs = null;
+		try {
+			PreparedStatement pre = con.prepareStatement(sql);
+			rs = pre.executeQuery();
 		} catch (Exception e) {
 			LogUtils.e(e.toString());
 		}
+		List<TbColumnInfo> info = toObject(rs, TbColumnInfo.class);
+		LogUtils.d("info=" + info);
 		closeConn(con);
-		return null;
+		return info;
 	}
 }

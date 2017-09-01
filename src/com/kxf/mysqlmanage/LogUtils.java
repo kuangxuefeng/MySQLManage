@@ -2,7 +2,7 @@ package com.kxf.mysqlmanage;
 
 public class LogUtils {
 	private static LogListener listener;
-	private static LogType logType = LogType.DEBUG;
+	private static LogType logType = LogType.INFO;
 	public static enum LogType{
 		DEBUG(1), INFO(2), WARN(3), ERROR(4);
 		public int value;

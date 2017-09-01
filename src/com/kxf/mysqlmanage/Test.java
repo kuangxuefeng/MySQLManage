@@ -7,7 +7,7 @@ import com.kxf.mysqlmanage.LogUtils.LogType;
 
 public class Test {
 	public static void main(String[] args) {
-		LogUtils.setLogType(LogType.INFO);
+		LogUtils.setLogType(LogType.DEBUG);
 		LogUtils.setListener(new LogListener() {
 			
 			@Override
@@ -44,17 +44,17 @@ public class Test {
 //		DBWhereBuilder dbw1 = new DBWhereBuilder("id", "=", "119");
 //		db.update(to, dbw1 );
 //		
-		List<TestObject> ls = db.findAll(TestObject.class);
-		System.out.println("ls=" + ls);
+//		List<TestObject> ls = db.findAll(TestObject.class);
+//		System.out.println("ls=" + ls);
+//		
+//		DBWhereBuilder dbw = new DBWhereBuilder("id", ">", "103");
+//		dbw.or("shenggao", "=", "175.55");
+//		List<TestObject> ls1 = db.find(TestObject.class, dbw, false, "shenggao", "id");
+//		System.out.println("ls1=" + ls1);
 		
-		DBWhereBuilder dbw = new DBWhereBuilder("id", ">", "103");
-		dbw.or("shenggao", "=", "175.55");
-		List<TestObject> ls1 = db.find(TestObject.class, dbw, false, "shenggao", "id");
-		System.out.println("ls1=" + ls1);
+		List<String> keys = db.getPrimaryKey(TestObject.class);
+		System.out.println("keys=" + keys);
 		
-//		String[] Keys = db.getPrimaryKey(TestObject.class);
-//		for (int i = 0; i < Keys.length; i++) {
-//			System.out.println(Keys[i]);
-//		}
+		db.getAllColumnDB(TestObject.class);
 	}
 }

@@ -1,8 +1,15 @@
 package com.kxf.mysqlmanage;
 
+import com.kxf.mysqlmanage.annotations.Column;
+
 public class TestObject {
+	@Column()
 	private int id;
+	
+	@Column()
 	private String name;
+	
+	@Column()
 	private double shenggao;
 	public int getId() {
 		return id;
