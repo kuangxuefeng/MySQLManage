@@ -38,10 +38,10 @@ public class Test {
 		to.setShg(133.45);
 		to.setAge(16);
 		System.out.println(to.getClass().getSimpleName());
-//		db.save(to);
+		db.save(to);
 //		db.saveOrUpdate(to);
 //		System.out.println("====" + db.delete(TestObject.class, null));
-		System.out.println("----" + db.dropTable(TestObject.class));
+//		System.out.println("----" + db.dropTable(TestObject.class));
 //		System.out.println("----" + db.dropTable(TbColumnInfo.class));
 		
 //		to.setId(119);

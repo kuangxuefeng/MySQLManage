@@ -64,7 +64,7 @@ public class TbColumnInfo {
 	}
 
 	private String removeKH(String str) {
-		if (SimpleDBManage.isEmpty(str)) {
+		if (BaseDBManage.isEmpty(str)) {
 			return "";
 		}
 		int index = str.indexOf("(");
@@ -82,13 +82,13 @@ public class TbColumnInfo {
 
 		TbColumnInfo tb = (TbColumnInfo) obj;
 
-		if (!SimpleDBManage.isEmpty(removeKH(Field))) {
+		if (!BaseDBManage.isEmpty(removeKH(Field))) {
 			if (!removeKH(Field).equals(removeKH(tb.Field))) {
 				return false;
 			}
 		}
 
-		if (!SimpleDBManage.isEmpty(removeKH(Type))) {
+		if (!BaseDBManage.isEmpty(removeKH(Type))) {
 			if (!removeKH(Type).equals(removeKH(tb.Type))) {
 				return false;
 			}
