@@ -32,14 +32,17 @@ public class Test {
 		});
 		SimpleDBManage db = new SimpleDBManage();
 		TestObject to = new TestObject();
-		to.setId(101);
-		to.setName("lili7");
+//		to.setId(102);
+		to.setName("lili5");
 //		to.setShenggao(175.55);
-		to.setShg(123.45);
-		to.setAge(13);
+		to.setShg(133.45);
+		to.setAge(16);
 		System.out.println(to.getClass().getSimpleName());
 //		db.save(to);
-		db.saveOrUpdate(to);
+//		db.saveOrUpdate(to);
+//		System.out.println("====" + db.delete(TestObject.class, null));
+		System.out.println("----" + db.dropTable(TestObject.class));
+//		System.out.println("----" + db.dropTable(TbColumnInfo.class));
 		
 //		to.setId(119);
 //		to.setName("haha119");

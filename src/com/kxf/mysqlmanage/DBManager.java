@@ -17,4 +17,7 @@ public interface DBManager {
 	<T> List<T> findAll(Class<T> cls);
 	
 	List<String> getTableNameByCon();
+	
+	int delete(Class cls, DBWhereBuilder dbw);
+	int dropTable(Class cls);
 }

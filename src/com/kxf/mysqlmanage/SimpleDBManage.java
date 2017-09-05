@@ -521,4 +521,45 @@ public class SimpleDBManage implements DBManager {
 		}
 		return false;
 	}
+
+	@Override
+	public int delete(Class cls, DBWhereBuilder dbw) {
+		// delete from MyClass where id=1
+		int raw = -1;
+		String sql = "delete from ";
+		String tName = cls.getSimpleName();
+		if (null == dbw) {
+			sql = sql + tName;
+		}else {
+			sql = sql + tName + dbw.getWhereSql();
+		}
+		Connection conn = openConnection();
+		LogUtils.i("sql=" + sql);
+		try {
+			Statement stat = conn.createStatement();
+			raw = stat.executeUpdate(sql);
+			closeConn(conn);
+		} catch (SQLException e) {
+			LogUtils.e(e.toString());
+		}
+		return raw;
+	}
+
+	@Override
+	public int dropTable(Class cls) {
+		int raw = -1;
+		String sql = "DROP TABLE IF EXISTS ";
+		String tName = cls.getSimpleName();
+		sql = sql + tName;
+		Connection conn = openConnection();
+		LogUtils.i("sql=" + sql);
+		try {
+			Statement stat = conn.createStatement();
+			raw = stat.executeUpdate(sql);
+			closeConn(conn);
+		} catch (SQLException e) {
+			LogUtils.e(e.toString());
+		}
+		return raw;
+	}
 }
