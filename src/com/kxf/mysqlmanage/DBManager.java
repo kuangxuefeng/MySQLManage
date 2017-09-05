@@ -7,10 +7,10 @@ public interface DBManager {
 	abstract Connection openConnection();
 	public abstract void closeConn(Connection conn);
 	
-	long save(Object o);
-	long saveOrUpdate(Object o);
+	int save(Object o);
+	int saveOrUpdate(Object o);
 
-	long update(Object o, DBWhereBuilder dbw);
+	int update(Object o, DBWhereBuilder dbw);
 	
 	<T> List<T> find(Class<T> cls, DBWhereBuilder dbw, String... orders);
 	<T> List<T> find(Class<T> cls, DBWhereBuilder dbw, Boolean isAsc, String... orders);

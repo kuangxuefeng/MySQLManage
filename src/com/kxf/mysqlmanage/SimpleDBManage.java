@@ -14,13 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.kxf.mysqlmanage.DBWhereBuilder.DBWhere;
+import com.kxf.mysqlmanage.annotations.DBAnnotation;
 
 public class SimpleDBManage implements DBManager {
-	private final String default_Primary_Key = "id";
+	private static String primaryKey = "id";
 	private final String orderSql = " ORDER BY ";// 排序语句
 
 	@Override
@@ -62,12 +61,12 @@ public class SimpleDBManage implements DBManager {
 	}
 
 	@Override
-	public long save(Object o) {
-		long raw = -1;
+	public int save(Object o) {
+		int raw = -1;
+		creatOrUpdateTable(o);
 		Connection conn = openConnection();
 		Map<String, Object> map = getContentValues(o);
 		String tName = o.getClass().getSimpleName();
-		creatTable(o);
 		String sql = "insert into ";
 		String columns = "";
 		String values = "";
@@ -95,12 +94,29 @@ public class SimpleDBManage implements DBManager {
 	}
 
 	@Override
-	public long saveOrUpdate(Object o) {
-		return 0;
+	public int saveOrUpdate(Object o) {
+		int raw = -1;
+		creatOrUpdateTable(o);
+		List<String> keys = getPrimaryKey(o.getClass());
+		if (null == keys || keys.size() < 1 || isEmpty(keys.get(0))) {
+			raw = save(o);
+		}else {
+			Map<String, Object> values = getContentValues(o);
+			DBWhereBuilder dbw = new DBWhereBuilder(keys.get(0), "=", values.get(keys.get(0)) + "");
+			List<? extends Object> ls = find(o.getClass(), dbw);
+			if (null == ls || ls.size() < 1) {
+				raw = save(o);
+			}else {
+				raw = update(o, dbw);
+			}
+		}
+		return raw;
 	}
 
 	@Override
-	public long update(Object o, DBWhereBuilder dbw) {
+	public int update(Object o, DBWhereBuilder dbw) {
+		creatOrUpdateTable(o);
+		int raw = -1;
 		String tName = o.getClass().getSimpleName();
 		String sql = "update " + tName + " set ";
 		Map<String, Object> setVal = getContentValues(o);
@@ -123,7 +139,6 @@ public class SimpleDBManage implements DBManager {
 		sql = sql + set + dbw.getWhereSql();
 		LogUtils.i("sql=" + sql);
 		Connection conn = openConnection();
-		long raw = -1;
 		try {
 			Statement stat = conn.createStatement();
 			raw = stat.executeUpdate(sql);
@@ -196,10 +211,10 @@ public class SimpleDBManage implements DBManager {
 		return false;
 	}
 
-	public boolean creatTable(Object o) {
-		Connection conn = openConnection();
-		String tName = o.getClass().getSimpleName();
+	public boolean creatOrUpdateTable(Object o) {
 		if (!isExitsTableName(o)) {
+			Connection conn = openConnection();
+			String tName = o.getClass().getSimpleName();
 			String types = getColumType(o);
 			String sql = "create table " + tName + "(" + types + ")";
 			LogUtils.i("sql=" + sql);
@@ -219,7 +234,79 @@ public class SimpleDBManage implements DBManager {
 	}
 
 	private boolean checkTableColumn(Object o) {
-
+		LogUtils.d("checkTableColumn(Object o) o=" + o);
+		List<TbColumnInfo> dbColumns = getAllColumnDB(o.getClass());
+		List<TbColumnInfo> objColumns = getAllColumnObj(o);
+		if (null == objColumns || objColumns.size() <1) {
+			return false;
+		}
+		if (null != dbColumns && dbColumns.size() > 0) {
+			for (TbColumnInfo tb : dbColumns) {
+				if (!isExits(objColumns, tb)) {
+					LogUtils.d("需要删除的字段：" + tb);
+					deleteColumn(o.getClass(), tb.getField());
+				}
+			}
+		}
+		
+		for (TbColumnInfo tb : objColumns) {
+			if (!isExits(dbColumns, tb)) {
+				LogUtils.d("需要添加的字段：" + tb);
+				addColumn(o.getClass(), tb.getField(), tb.getType());
+			}
+		}
+		return true;
+	}
+	
+	public int addColumn(Class c, String colu, String type) {
+		int raw = -1;
+		if (isEmpty(colu) || isEmpty(type)) {
+			return raw;
+		}
+		String sql = "ALTER TABLE ";
+		String tName = c.getSimpleName();
+		sql = sql + tName + " ADD " + colu + " " + type;
+		Connection conn = openConnection();
+		LogUtils.i("sql=" + sql);
+		try {
+			Statement stat = conn.createStatement();
+			raw = stat.executeUpdate(sql);
+			closeConn(conn);
+		} catch (SQLException e) {
+			LogUtils.e(e.toString());
+		}
+		return raw;
+	}
+	
+	public int deleteColumn(Class c, String colu) {
+		int raw = -1;
+		if (isEmpty(colu)) {
+			return raw;
+		}
+		String sql = "alter table ";
+		String tName = c.getSimpleName();
+		sql = sql + tName + " drop column " + colu;
+		Connection conn = openConnection();
+		LogUtils.i("sql=" + sql);
+		try {
+			Statement stat = conn.createStatement();
+			raw = stat.executeUpdate(sql);
+			closeConn(conn);
+		} catch (SQLException e) {
+			LogUtils.e(e.toString());
+		}
+		return raw;
+	}
+	
+	private <T> boolean isExits(List<T> ls, T t){
+		if (null == ls || ls.size() < 1 || null == t) {
+			return false;
+		}
+		for (T t1 : ls) {
+			if (t.equals(t1)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -231,7 +318,7 @@ public class SimpleDBManage implements DBManager {
 		for (int i = 0; i < fs.length; i++) {
 			fs[i].setAccessible(true);
 			Class<?> type = fs[i].getType();
-			if ("java.lang.String".equals(type.getSimpleName())) {
+			if ("String".equals(type.getSimpleName())) {
 				types = types + fs[i].getName() + " " + "varchar(20), ";
 			} else if ("int".equals(type.getSimpleName())) {
 				types = types + fs[i].getName() + " " + "int, ";
@@ -240,14 +327,18 @@ public class SimpleDBManage implements DBManager {
 			} else {
 				types = types + fs[i].getName() + " " + "varchar(20), ";
 			}
-			if (default_Primary_Key.equals(fs[i].getName())) {
-				hasPrimaryKey = true;
-				types = types.substring(0, types.length() - ", ".length());
-				types = types + " NOT NULL AUTO_INCREMENT" + ", ";
+			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+				if (dba.isKey()) {
+					hasPrimaryKey = true;
+					primaryKey = fs[i].getName();
+					types = types.substring(0, types.length() - ", ".length());
+					types = types + " NOT NULL AUTO_INCREMENT" + ", ";
+				}
 			}
 		}
 		if (hasPrimaryKey) {
-			types = types + "PRIMARY KEY (`id`)";
+			types = types + "PRIMARY KEY (`" + primaryKey + "`)";
 		} else {
 			types = types.substring(0, types.length() - ", ".length());
 		}
@@ -262,6 +353,17 @@ public class SimpleDBManage implements DBManager {
 	@Override
 	public <T> List<T> find(Class<T> cls, DBWhereBuilder dbw, Boolean isAsc,
 			String... orders) {
+		Object o = null;
+		try {
+			o = Class.forName(cls.getName()).newInstance();
+		} catch (InstantiationException e) {
+			LogUtils.e(e.toString());
+		} catch (IllegalAccessException e) {
+			LogUtils.e(e.toString());
+		} catch (ClassNotFoundException e) {
+			LogUtils.e(e.toString());
+		}
+		creatOrUpdateTable(o);
 		String tName = cls.getSimpleName();
 		String orderStr = " ";
 		if (orders != null && orders.length > 0) {
@@ -368,7 +470,6 @@ public class SimpleDBManage implements DBManager {
 
 	public List<TbColumnInfo> getAllColumnDB(Class cls) {
 		Connection con = openConnection();
-		;
 		String tName = cls.getSimpleName();
 		String sql = "SHOW COLUMNS FROM " + tName;
 		ResultSet rs = null;
@@ -382,5 +483,42 @@ public class SimpleDBManage implements DBManager {
 		LogUtils.d("info=" + info);
 		closeConn(con);
 		return info;
+	}
+
+	public List<TbColumnInfo> getAllColumnObj(Object o) {
+		List<TbColumnInfo> info = new ArrayList<TbColumnInfo>();
+		Class cls = o.getClass();
+		Field[] fs = cls.getDeclaredFields();
+		for (int i = 0; i < fs.length; i++) {
+			TbColumnInfo tb = new TbColumnInfo();
+			tb.setField(fs[i].getName());
+			fs[i].setAccessible(true);
+			Class<?> type = fs[i].getType();
+			if ("String".equals(type.getSimpleName())) {
+				tb.setType("varchar(20)");
+			} else if ("int".equals(type.getSimpleName())) {
+				tb.setType("int");
+			} else if ("double".equals(type.getSimpleName())) {
+				tb.setType("double");
+			} else {
+				tb.setType("varchar(20)");
+			}
+			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+				if (dba.isKey()) {
+					tb.setKey("PRI");
+				}
+			}
+			info.add(tb);
+		}
+		LogUtils.d("info=" + info);
+		return info;
+	}
+	
+	public static boolean isEmpty(String str) {
+		if (null == str || str.length() < 1 || "null".equalsIgnoreCase(str)) {
+			return true;
+		}
+		return false;
 	}
 }

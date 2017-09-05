@@ -32,11 +32,14 @@ public class Test {
 		});
 		SimpleDBManage db = new SimpleDBManage();
 		TestObject to = new TestObject();
-//		to.setId(100);
-//		to.setName("lili3");
-//		to.setShenggao(165.55);
-//		System.out.println(to.getClass().getSimpleName());
+		to.setId(101);
+		to.setName("lili7");
+//		to.setShenggao(175.55);
+		to.setShg(123.45);
+		to.setAge(13);
+		System.out.println(to.getClass().getSimpleName());
 //		db.save(to);
+		db.saveOrUpdate(to);
 		
 //		to.setId(119);
 //		to.setName("haha119");
@@ -52,9 +55,10 @@ public class Test {
 //		List<TestObject> ls1 = db.find(TestObject.class, dbw, false, "shenggao", "id");
 //		System.out.println("ls1=" + ls1);
 		
-		List<String> keys = db.getPrimaryKey(TestObject.class);
-		System.out.println("keys=" + keys);
-		
-		db.getAllColumnDB(TestObject.class);
+//		List<String> keys = db.getPrimaryKey(TestObject.class);
+//		System.out.println("keys=" + keys);
+//		
+//		db.getAllColumnDB(TestObject.class);
+//		db.getAllColumnObj(to);
 	}
 }
