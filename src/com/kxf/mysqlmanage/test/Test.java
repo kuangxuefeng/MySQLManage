@@ -1,7 +1,9 @@
-package com.kxf.mysqlmanage;
+package com.kxf.mysqlmanage.test;
 
 import java.util.List;
 
+import com.kxf.mysqlmanage.LogUtils;
+import com.kxf.mysqlmanage.SimpleDBManage;
 import com.kxf.mysqlmanage.LogUtils.LogListener;
 import com.kxf.mysqlmanage.LogUtils.LogType;
 
@@ -36,7 +38,7 @@ public class Test {
 		to.setName("lili5");
 //		to.setShenggao(175.55);
 		to.setShg(133.45);
-		to.setAge(16);
+		to.setAge(19);
 		System.out.println(to.getClass().getSimpleName());
 		db.save(to);
 //		db.saveOrUpdate(to);

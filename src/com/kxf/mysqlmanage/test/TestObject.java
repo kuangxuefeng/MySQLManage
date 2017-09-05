@@ -1,4 +1,4 @@
-package com.kxf.mysqlmanage;
+package com.kxf.mysqlmanage.test;
 
 import com.kxf.mysqlmanage.annotations.DBAnnotation;
 
