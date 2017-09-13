@@ -1,5 +1,8 @@
 package com.kxf.mysqlmanage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -13,8 +16,14 @@ public class SimpleDBManage extends BaseDBManage {
 		String username = null;
 		String password = null;
 		try {
-			prop.load(this.getClass().getClassLoader()
-					.getResourceAsStream("DBConfig.properties"));
+//			System.out.println("===========");
+//			InputStream in = this.getClass().getClassLoader()
+//					.getResourceAsStream("/DBConfig.properties");
+//			File file = new File("." + File.separator + "DBConfig.properties");
+//			System.out.println(file.getPath());
+			InputStream in = new FileInputStream("." + File.separator + "DBConfig.properties");
+//			System.out.println("===========" + in.toString());
+			prop.load(in);
 			driver = prop.getProperty("driver");
 			url = prop.getProperty("url");
 			username = prop.getProperty("username");
