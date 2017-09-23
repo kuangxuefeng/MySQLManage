@@ -6,7 +6,10 @@ public class TestObject {
 	@DBAnnotation(isKey = true)
 	private int id;
 
+	@DBAnnotation(length = 20)
 	private String name;
+	
+	private String nameSub;
 
 	// private double shenggao;
 
@@ -46,9 +49,17 @@ public class TestObject {
 		this.name = name;
 	}
 
+	public String getNameSub() {
+		return nameSub;
+	}
+
+	public void setNameSub(String nameSub) {
+		this.nameSub = nameSub;
+	}
+
 	@Override
 	public String toString() {
-		return "TestObject [id=" + id + ", name=" + name + ", shg=" + shg
-				+ ", age=" + age + "]";
+		return "TestObject [id=" + id + ", name=" + name + ", nameSub="
+				+ nameSub + ", shg=" + shg + ", age=" + age + "]";
 	}
 }

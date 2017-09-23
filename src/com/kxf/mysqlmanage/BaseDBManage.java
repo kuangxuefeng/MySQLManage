@@ -296,13 +296,23 @@ public abstract class BaseDBManage implements DBManager {
 			fs[i].setAccessible(true);
 			Class<?> type = fs[i].getType();
 			if ("String".equals(type.getSimpleName())) {
-				types = types + fs[i].getName() + " " + "varchar(20), ";
+				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+					types = types + fs[i].getName() + " " + "varchar(" + dba.length() + "), ";
+				}else {
+					types = types + fs[i].getName() + " " + "varchar(255), ";
+				}
 			} else if ("int".equals(type.getSimpleName())) {
 				types = types + fs[i].getName() + " " + "int, ";
 			} else if ("double".equals(type.getSimpleName())) {
 				types = types + fs[i].getName() + " " + "double, ";
 			} else {
-				types = types + fs[i].getName() + " " + "varchar(20), ";
+				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+					types = types + fs[i].getName() + " " + "varchar(" + dba.length() + "), ";
+				}else {
+					types = types + fs[i].getName() + " " + "varchar(255), ";
+				}
 			}
 			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
 				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
@@ -472,13 +482,23 @@ public abstract class BaseDBManage implements DBManager {
 			fs[i].setAccessible(true);
 			Class<?> type = fs[i].getType();
 			if ("String".equals(type.getSimpleName())) {
-				tb.setType("varchar(20)");
+				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+					tb.setType("varchar(" + dba.length() + ")");
+				}else {
+					tb.setType("varchar(255)");
+				}
 			} else if ("int".equals(type.getSimpleName())) {
 				tb.setType("int");
 			} else if ("double".equals(type.getSimpleName())) {
 				tb.setType("double");
 			} else {
-				tb.setType("varchar(20)");
+				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
+					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
+					tb.setType("varchar(" + dba.length() + ")");
+				}else {
+					tb.setType("varchar(255)");
+				}
 			}
 			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
 				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);

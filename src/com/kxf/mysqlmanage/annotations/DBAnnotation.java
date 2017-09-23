@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 public @interface DBAnnotation {
 	boolean canNull() default true;
 	boolean isKey() default false;
+	int length() default 255;
 }
