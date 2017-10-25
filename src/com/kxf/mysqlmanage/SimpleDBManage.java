@@ -31,7 +31,7 @@ public class SimpleDBManage extends BaseDBManage {
 			Class.forName(driver);
 			return DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
-			LogUtils.e(e.toString());
+			e.printStackTrace();
 		}
 		return null;
 	}
