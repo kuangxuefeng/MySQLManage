@@ -36,15 +36,37 @@ public class Test {
 //			}
 //		});
 		SimpleDBManage db = new SimpleDBManage();
+		db.setLogUtils(new LogUtils(new LogListener() {
+			
+			@Override
+			public void i(String i) {
+				System.out.println(i);
+			}
+			
+			@Override
+			public void e(String e) {
+				System.err.println(e);
+			}
+
+			@Override
+			public void d(String d) {
+				System.out.println(d);
+			}
+
+			@Override
+			public void w(String w) {
+				System.err.println(w);
+			}
+		}));
 		TestObject to = new TestObject();
-//		to.setId(102);
+		to.setId(102);
 		to.setNameSub("lili511111111111111111111111111111111");
 //		to.setShenggao(175.55);
 		to.setShg(175.55);
 		to.setAge(19);
 		System.out.println(to.getClass().getSimpleName());
-//		db.save(to);
-		db.saveOrUpdate(to);
+		db.save(to);
+//		db.saveOrUpdate(to);
 //		System.out.println("====" + db.delete(TestObject.class, null));
 //		System.out.println("----" + db.dropTable(TestObject.class));
 //		System.out.println("----" + db.dropTable(TbColumnInfo.class));

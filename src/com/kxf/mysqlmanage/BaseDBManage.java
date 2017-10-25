@@ -19,11 +19,16 @@ import com.kxf.mysqlmanage.annotations.DBAnnotation;
 public abstract class BaseDBManage implements DBManager {
 	protected static String primaryKey = "id";
 	protected final String orderSql = " ORDER BY ";// 排序语句
+	private static final String erro_buzhichileixing = "为不支持的数据类型，目前支持的交易类型有：String，int，double";
 	protected LogUtils logUtils = new LogUtils();
 
 	@Override
 	public abstract Connection openConnection();
 
+	public void setLogUtils(LogUtils logUtils) {
+		this.logUtils = logUtils;
+	}
+	
 	@Override
 	public void closeConn(Connection conn) throws SQLException {
 		if (conn != null) {
@@ -258,7 +263,7 @@ public abstract class BaseDBManage implements DBManager {
 		return false;
 	}
 
-	public String getColumType(Object o) {
+	public String getColumType(Object o) throws MySqlManagerException {
 		String types = "";
 		Class cls = o.getClass();
 		Field[] fs = cls.getDeclaredFields();
@@ -278,12 +283,7 @@ public abstract class BaseDBManage implements DBManager {
 			} else if ("double".equals(type.getSimpleName())) {
 				types = types + fs[i].getName() + " " + "double, ";
 			} else {
-				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
-					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
-					types = types + fs[i].getName() + " " + "varchar(" + dba.length() + "), ";
-				}else {
-					types = types + fs[i].getName() + " " + "varchar(255), ";
-				}
+				throw new MySqlManagerException(type.getSimpleName() + erro_buzhichileixing);
 			}
 			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
 				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
@@ -377,7 +377,7 @@ public abstract class BaseDBManage implements DBManager {
 						fs[i].set(t,
 								rs.getDouble(rs.findColumn(fs[i].getName())));
 					} else {
-						// 按需要添加
+						throw new MySqlManagerException(type.getSimpleName() + erro_buzhichileixing);
 					}
 				}
 				list.add(t);
@@ -435,7 +435,7 @@ public abstract class BaseDBManage implements DBManager {
 		return info;
 	}
 
-	public List<TbColumnInfo> getAllColumnObj(Object o) {
+	public List<TbColumnInfo> getAllColumnObj(Object o) throws MySqlManagerException {
 		List<TbColumnInfo> info = new ArrayList<TbColumnInfo>();
 		Class cls = o.getClass();
 		Field[] fs = cls.getDeclaredFields();
@@ -456,12 +456,7 @@ public abstract class BaseDBManage implements DBManager {
 			} else if ("double".equals(type.getSimpleName())) {
 				tb.setType("double");
 			} else {
-				if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
-					DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
-					tb.setType("varchar(" + dba.length() + ")");
-				}else {
-					tb.setType("varchar(255)");
-				}
+				throw new MySqlManagerException(type.getSimpleName() + erro_buzhichileixing);
 			}
 			if (fs[i].isAnnotationPresent(DBAnnotation.class)) {
 				DBAnnotation dba = fs[i].getAnnotation(DBAnnotation.class);
