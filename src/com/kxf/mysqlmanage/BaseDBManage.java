@@ -23,7 +23,7 @@ public abstract class BaseDBManage implements DBManager {
 	protected LogUtils logUtils = new LogUtils();
 
 	@Override
-	public abstract Connection openConnection();
+	public abstract Connection openConnection() throws SQLException, MySqlManagerException;
 
 	public void setLogUtils(LogUtils logUtils) {
 		this.logUtils = logUtils;
@@ -147,7 +147,7 @@ public abstract class BaseDBManage implements DBManager {
 	}
 
 	@Override
-	public List<String> getTableNameByCon() throws SQLException {
+	public List<String> getTableNameByCon() throws SQLException, MySqlManagerException {
 		Connection conn = openConnection();
 		List<String> ls = new ArrayList<String>();
 		DatabaseMetaData meta = conn.getMetaData();
@@ -160,7 +160,7 @@ public abstract class BaseDBManage implements DBManager {
 		return ls;
 	}
 
-	public boolean isExitsTableName(Object o) throws SQLException {
+	public boolean isExitsTableName(Object o) throws SQLException, MySqlManagerException {
 		String tName = o.getClass().getSimpleName();
 		logUtils.i("tName=" + tName);
 		if (null == tName || tName.length() < 1) {
@@ -219,7 +219,7 @@ public abstract class BaseDBManage implements DBManager {
 		return true;
 	}
 	
-	public int addColumn(Class c, String colu, String type) throws SQLException {
+	public int addColumn(Class c, String colu, String type) throws SQLException, MySqlManagerException {
 		int raw = -1;
 		if (isEmpty(colu) || isEmpty(type)) {
 			return raw;
@@ -235,7 +235,7 @@ public abstract class BaseDBManage implements DBManager {
 		return raw;
 	}
 	
-	public int deleteColumn(Class c, String colu) throws SQLException {
+	public int deleteColumn(Class c, String colu) throws SQLException, MySqlManagerException {
 		int raw = -1;
 		if (isEmpty(colu)) {
 			return raw;
@@ -478,7 +478,7 @@ public abstract class BaseDBManage implements DBManager {
 	}
 
 	@Override
-	public int delete(Class cls, DBWhereBuilder dbw) throws SQLException {
+	public int delete(Class cls, DBWhereBuilder dbw) throws SQLException, MySqlManagerException {
 		// delete from MyClass where id=1
 		int raw = -1;
 		String sql = "delete from ";
@@ -497,7 +497,7 @@ public abstract class BaseDBManage implements DBManager {
 	}
 
 	@Override
-	public int dropTable(Class cls) throws SQLException {
+	public int dropTable(Class cls) throws SQLException, MySqlManagerException {
 		int raw = -1;
 		String sql = "DROP TABLE IF EXISTS ";
 		String tName = cls.getSimpleName();

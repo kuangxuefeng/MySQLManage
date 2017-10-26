@@ -57,9 +57,9 @@ public class Test {
 			public void w(String w) {
 				System.err.println(w);
 			}
-		}));
+		}, LogType.DEBUG));
 		TestObject to = new TestObject();
-		to.setId(102);
+//		to.setId(102);
 		to.setNameSub("lili511111111111111111111111111111111");
 //		to.setShenggao(175.55);
 		to.setShg(175.55);

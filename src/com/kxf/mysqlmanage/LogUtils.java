@@ -22,7 +22,12 @@ public class LogUtils {
 	}
 
 	public LogUtils(LogListener listener) {
-
+		this.listener = listener;
+	}
+	
+	public LogUtils(LogListener listener, LogType logType) {
+		this.listener = listener;
+		this.logType = logType;
 	}
 
 	public LogType getLogType() {
